@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>SudokuSolver</RootNamespace>
     <Product>Su-Do-Ku Solver</Product>
     <Company>Shridhara Rangaraju</Company>
     <Copyright>Copyright © 2018 Shridhara Rangaraju</Copyright>
