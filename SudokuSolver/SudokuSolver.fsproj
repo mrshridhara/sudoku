@@ -5,6 +5,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Authors>Shridhara Rangaraju</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RepositoryUrl>https://github.com/mrshridhara/sudoku/</RepositoryUrl>
+    <PackageTags>sudoku solver</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

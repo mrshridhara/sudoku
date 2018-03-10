@@ -2,7 +2,8 @@
 
 open System.Reflection
 
-[<AssemblyProduct("Su-Do-Ku Solver")>]
+[<AssemblyProduct("SUDOKU Solver")>]
+[<AssemblyDescription("SUDOKU solver library.")>]
 [<AssemblyCompany("Shridhara Rangaraju")>]
 [<AssemblyCopyright("Copyright © 2018 Shridhara Rangaraju")>]
 [<AssemblyVersion("1.0.0.*")>]
