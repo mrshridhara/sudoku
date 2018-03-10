@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SudokuSolver.Models
+namespace SudokuSolver
 {
-    static class ModelExtensions
+    public static class ArrayExtensions
     {
         public static int[] To1DArray(this int[,] src)
         {

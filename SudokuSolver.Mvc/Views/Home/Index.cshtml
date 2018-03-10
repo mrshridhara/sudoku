@@ -39,7 +39,7 @@ else if (!Model.IsValid || Model.Puzzle == null || Model.Puzzle.Any(i => i == nu
                         @for (int j = 0; j < size; j++)
                         {
                             <td>
-                                <input class="form-control" asp-for="Puzzle[index]" value="@(index + 1)" />
+                                <input class="form-control" asp-for="Puzzle[index]" />
                             </td>
                             index++;
                         }

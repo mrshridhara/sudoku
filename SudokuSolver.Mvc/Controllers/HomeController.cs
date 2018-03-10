@@ -27,7 +27,7 @@ namespace SudokuSolver.Controllers
             try
             {
                 var data = model.Puzzle.Select(i => i.GetValueOrDefault()).To2DSquareArray();
-                var solved = Puzzle.solve(data).To1DArray();
+                var solved = Puzzle.Solve(data).To1DArray();
                 model.Puzzle = solved.Select(i => i == 0 ? default(int?) : i).ToArray();
             }
             catch (ArgumentException ex)

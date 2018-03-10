@@ -1,12 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <Import Project="..\Common.props" />
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <RootNamespace>SudokuSolver</RootNamespace>
-    <Product>SUDOKU Solver</Product>
-    <Company>Shridhara Rangaraju</Company>
-    <Copyright>Copyright © 2018 Shridhara Rangaraju</Copyright>
-    <Version>1.0.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,11 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SudokuSolver\SudokuSolver.fsproj" />
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.*" />
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.*" />
+    <ProjectReference Include="..\SudokuSolver\SudokuSolver.csproj" />
   </ItemGroup>
 
 </Project>
