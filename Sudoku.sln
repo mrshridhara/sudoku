@@ -1,0 +1,43 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26124.0
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{36E32D6F-644D-4225-A289-CAC84D7078A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuSolver", "src\SudokuSolver\SudokuSolver.csproj", "{EDDD23E6-BA38-46BE-9458-8D2224AB40E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuSolver.Mvc", "src\SudokuSolver.Mvc\SudokuSolver.Mvc.csproj", "{836EBC01-27A8-4FF9-811F-6E072118BEF0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{97E8DC47-D0C3-468A-AAF2-1FB6C8511127}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuSolver.Test", "tests\SudokuSolver.Test\SudokuSolver.Test.csproj", "{6F2105A8-D4B8-43FC-8719-45F00FEBADDC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EDDD23E6-BA38-46BE-9458-8D2224AB40E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDDD23E6-BA38-46BE-9458-8D2224AB40E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDDD23E6-BA38-46BE-9458-8D2224AB40E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDDD23E6-BA38-46BE-9458-8D2224AB40E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{836EBC01-27A8-4FF9-811F-6E072118BEF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{836EBC01-27A8-4FF9-811F-6E072118BEF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{836EBC01-27A8-4FF9-811F-6E072118BEF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{836EBC01-27A8-4FF9-811F-6E072118BEF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F2105A8-D4B8-43FC-8719-45F00FEBADDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F2105A8-D4B8-43FC-8719-45F00FEBADDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F2105A8-D4B8-43FC-8719-45F00FEBADDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F2105A8-D4B8-43FC-8719-45F00FEBADDC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EDDD23E6-BA38-46BE-9458-8D2224AB40E5} = {36E32D6F-644D-4225-A289-CAC84D7078A2}
+		{836EBC01-27A8-4FF9-811F-6E072118BEF0} = {36E32D6F-644D-4225-A289-CAC84D7078A2}
+		{6F2105A8-D4B8-43FC-8719-45F00FEBADDC} = {97E8DC47-D0C3-468A-AAF2-1FB6C8511127}
+	EndGlobalSection
+EndGlobal
