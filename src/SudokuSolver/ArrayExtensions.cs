@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace SudokuSolver
+﻿namespace SudokuSolver
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public static class ArrayExtensions
     {
         public static int[] To1DArray(this int[,] src)

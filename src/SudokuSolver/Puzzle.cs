@@ -1,84 +1,84 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-
 namespace SudokuSolver
 {
-    public sealed class Puzzle
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    public static class Puzzle
     {
-        public static IReadOnlyCollection<int> SupportedSizes { get; } = Enum.GetValues(typeof(GridSize)).Cast<int>().ToArray();
+        public static IReadOnlyCollection<int> SupportedSizes { get; } =
+            Enum.GetValues(typeof(GridSize)).Cast<int>().ToArray();
 
         public static int[,] Solve(int[,] grid)
         {
-            var size = (int)Math.Sqrt(grid.Length);
+            var size = (int) Math.Sqrt(grid.Length);
             if ((size * size) != grid.Length)
-                throw new ArgumentException("Invalid puzzle length. Should be a perfect square.", nameof(grid));
+                throw new ArgumentException("Puzzle length should be a perfect square.", nameof(grid));
 
             if (!Enum.IsDefined(typeof(GridSize), size))
                 throw new ArgumentException("Unsupported puzzle size.", nameof(grid));
 
-            s_allowedValues = Enumerable.Range(1, size).ToArray();
-            var subGridSize = s_subGridSize[(GridSize)size];
-            var puzzle = new Puzzle(size, subGridSize.Rows, subGridSize.Columns, grid);
+            var subGridSize = s_subGridSizeMap[(GridSize) size];
+            var cells = CreateCells(size, subGridSize.Rows, subGridSize.Columns, grid);
 
-            if (puzzle.Solve())
-                return puzzle._cells.Select(c => c.Value).To2DSquareArray();
+            if (Solve(cells))
+                return cells.Select(c => c.Value).To2DSquareArray();
 
-            throw new ArgumentException("Unsolvable puzzle.", nameof(grid));
+            throw new ArgumentException("Puzzle can have multiple solutions.", nameof(grid));
         }
 
         #region Implementation
 
-        static readonly IReadOnlyDictionary<GridSize, (int Rows, int Columns)> s_subGridSize =
+        static readonly IReadOnlyDictionary<GridSize, (int Rows, int Columns)> s_subGridSizeMap =
             new Dictionary<GridSize, (int, int)>
             {
                 { GridSize.NineByNine, (3, 3) }
             };
 
-        static IEnumerable<int> s_allowedValues;
-
-        readonly Cell[] _cells;
-
-        Puzzle(int size, int subGridRows, int subGridColumns, int[,] grid)
+        private static IReadOnlyCollection<Cell> CreateCells(int size, int subGridRows, int subGridColumns, int[,] grid)
         {
+            var cells = new List<Cell>(grid.Length);
+
             var rows = Enumerable.Range(0, size).Select(_ => new Boundry(size)).ToArray();
             var columns = Enumerable.Range(0, size).Select(_ => new Boundry(size)).ToArray();
             var subGrids = new Boundry[subGridColumns, subGridRows];
-            var cells = new List<Cell>(grid.Length);
+            var allowedValues = Enumerable.Range(1, size).ToArray();
 
-            for (int x = 0; x < size; x++)
+            for (var x = 0; x < size; x++)
             {
-                int subx = x / subGridRows;
+                var subx = x / subGridRows;
 
-                for (int y = 0; y < size; y++)
+                for (var y = 0; y < size; y++)
                 {
-                    int suby = y / subGridColumns;
+                    var suby = y / subGridColumns;
 
                     if (subGrids[subx, suby] == null)
                         subGrids[subx, suby] = new Boundry(size);
 
-                    var subGrid = subGrids[subx, suby];
-                    var cell = new Cell(rows[x], columns[y], subGrid, grid[x, y]);
-                    cells.Add(cell);
+                    cells.Add(new Cell(
+                        allowedValues,
+                        rows[x],
+                        columns[y],
+                        subGrids[subx, suby],
+                        grid[x, y]));
                 }
             }
 
-            _cells = cells.ToArray();
+            return cells;
         }
 
-        bool Solve()
+        static bool Solve(IReadOnlyCollection<Cell> cells)
         {
-            var progressed = _cells.All(c => c.Value != 0);
+            var progressed = cells.All(c => c.Value != 0);
             if (progressed) return true;
 
-            foreach (var cell in _cells.Where(c => c.Value == 0))
+            foreach (var cell in cells.Where(c => c.Value == 0))
             {
                 var updated = cell.TryUpdate();
                 progressed = progressed || updated;
             }
 
-            return progressed && Solve();
+            return progressed && Solve(cells);
         }
 
         enum GridSize : int
@@ -101,16 +101,23 @@ namespace SudokuSolver
 
         sealed class Cell
         {
+            readonly IReadOnlyCollection<int> _allowedValues;
             readonly IReadOnlyCollection<Boundry> _boundries;
 
-            internal Cell(Boundry row, Boundry column, Boundry subGrid, int value)
+            internal Cell(
+                IReadOnlyCollection<int> allowedValues,
+                Boundry row,
+                Boundry column,
+                Boundry subGrid,
+                int value)
             {
-                if (value != 0 && !s_allowedValues.Contains(value))
+                _allowedValues = allowedValues;
+                if (value != 0 && !_allowedValues.Contains(value))
                     throw new ArgumentException($"Invalid value {value}", nameof(value));
 
                 _boundries = new[] { row, column, subGrid };
-                foreach (var b in _boundries)
-                    b.Append(this);
+                foreach (var boundry in _boundries)
+                    boundry.Append(this);
 
                 Value = value;
             }
@@ -124,12 +131,16 @@ namespace SudokuSolver
                 if (Value != 0) return false;
 
                 var possibleValues = _boundries
-                    .Aggregate(s_allowedValues, (all, cur) => all.Except(cur.GetExistingValues()))
+                    .Aggregate(
+                        (IEnumerable<int>) _allowedValues,
+                        (all, cur) => all.Except(cur.GetExistingValues()))
                     .ToArray();
 
                 switch (possibleValues.Length)
                 {
-                    case 0: throw new InvalidOperationException("Unsolvable puzzle.");
+                    case 0:
+                        throw new InvalidOperationException(
+                            $"No possible values for cell. Boundries:\n{string.Join("\n", _boundries)}");
 
                     case 1:
                         Value = possibleValues[0];
