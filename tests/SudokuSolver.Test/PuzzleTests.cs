@@ -1,29 +1,33 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace SudokuSolver.Test
 {
-    [TestClass]
-    public class PuzzleTests
+    public sealed class PuzzleTests
     {
-        [TestMethod]
-        public void SolveTests()
+        [Fact]
+        public void Solve_ForEasy_Succeeds()
         {
-            const int _ = 0;
+            // Arrange.
             var grid = new int[9, 9]
             {
-                { 7, _, _, 9, 1, 5, _, _, 6 },
-                { _, 6, _, _, 8, _, _, 4, _ },
-                { _, _, 5, _, _, _, 7, _, _ },
-                { _, _, _, 4, _, 1, _, _, _ },
-                { 4, 1, 2, 3, _, 6, 8, 7, 5 },
-                { _, _, _, 5, _, 8, _, _, _ },
-                { _, _, 8, _, _, _, 2, _, _ },
-                { _, 4, _, _, 6, _, _, 1, _ },
-                { 1, _, _, 7, 5, 3, _, _, 8 }
+                { 4, 1, 0, 0, 6, 0, 0, 7, 8 },
+                { 7, 3, 0, 5, 0, 1, 4, 2, 0 },
+                { 0, 0, 8, 4, 7, 3, 0, 6, 0 },
+                { 0, 5, 0, 0, 9, 4, 8, 3, 0 },
+                { 3, 9, 0, 0, 1, 0, 7, 0, 0 },
+                { 2, 8, 4, 3, 0, 0, 0, 0, 0 },
+                { 6, 0, 0, 0, 0, 0, 0, 8, 0 },
+                { 0, 0, 1, 9, 4, 0, 0, 0, 0 },
+                { 0, 4, 9, 0, 2, 8, 0, 0, 0 },
             };
 
+            // Act.
             var actual = Puzzle.Solve(grid);
-            //Assert.
+
+            // Assert.
+            Assert.NotNull(actual);
+            var array = actual.To1DArray();
+            Assert.All(array, each => Assert.NotEqual(0, each));
         }
     }
 }

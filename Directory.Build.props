@@ -1,0 +1,10 @@
+<Project>
+
+  <PropertyGroup>
+    <Product>SUDOKU Solver</Product>
+    <Company>Shridhara Rangaraju</Company>
+    <Copyright>Copyright © $([System.DateTime]::Today.Year) Shridhara Rangaraju</Copyright>
+    <Version>0.1.0.0</Version>
+  </PropertyGroup>
+
+</Project>

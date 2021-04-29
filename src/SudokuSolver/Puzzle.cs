@@ -7,7 +7,7 @@ namespace SudokuSolver
 {
     public sealed class Puzzle
     {
-        public static int[] SupportedSizes { get; } = Enum.GetValues(typeof(Sizes)).Cast<int>().ToArray();
+        public static IReadOnlyCollection<int> SupportedSizes { get; } = Enum.GetValues(typeof(GridSize)).Cast<int>().ToArray();
 
         public static int[,] Solve(int[,] grid)
         {
@@ -15,11 +15,12 @@ namespace SudokuSolver
             if ((size * size) != grid.Length)
                 throw new ArgumentException("Invalid puzzle length. Should be a perfect square.", nameof(grid));
 
-            if (!Enum.IsDefined(typeof(Sizes), size))
+            if (!Enum.IsDefined(typeof(GridSize), size))
                 throw new ArgumentException("Unsupported puzzle size.", nameof(grid));
 
-            var subGridSize = s_subGridSize[(Sizes)size];
-            var puzzle = new Puzzle(size, subGridSize.Item1, subGridSize.Item2, grid);
+            s_allowedValues = Enumerable.Range(1, size).ToArray();
+            var subGridSize = s_subGridSize[(GridSize)size];
+            var puzzle = new Puzzle(size, subGridSize.Rows, subGridSize.Columns, grid);
 
             if (puzzle.Solve())
                 return puzzle._cells.Select(c => c.Value).To2DSquareArray();
@@ -29,26 +30,23 @@ namespace SudokuSolver
 
         #region Implementation
 
-        static readonly IReadOnlyDictionary<Sizes, ValueTuple<int, int>> s_subGridSize =
-            new Dictionary<Sizes, ValueTuple<int, int>>
+        static readonly IReadOnlyDictionary<GridSize, (int Rows, int Columns)> s_subGridSize =
+            new Dictionary<GridSize, (int, int)>
             {
-                { Sizes.NineByNine, (3, 3) }
+                { GridSize.NineByNine, (3, 3) }
             };
 
+        static IEnumerable<int> s_allowedValues;
+
         readonly Cell[] _cells;
-        readonly Boundry[] _rows;
-        readonly Boundry[] _columns;
-        readonly Boundry[,] _subGrids;
 
         Puzzle(int size, int subGridRows, int subGridColumns, int[,] grid)
         {
-            Func<Boundry> ctor = () => new Boundry(size);
-
-            _rows = Enumerable.Repeat(ctor, size).Select(f => f()).ToArray();
-            _columns = Enumerable.Repeat(ctor, size).Select(f => f()).ToArray();
-            _subGrids = new Boundry[subGridColumns, subGridRows];
-
+            var rows = Enumerable.Range(0, size).Select(_ => new Boundry(size)).ToArray();
+            var columns = Enumerable.Range(0, size).Select(_ => new Boundry(size)).ToArray();
+            var subGrids = new Boundry[subGridColumns, subGridRows];
             var cells = new List<Cell>(grid.Length);
+
             for (int x = 0; x < size; x++)
             {
                 int subx = x / subGridRows;
@@ -56,9 +54,12 @@ namespace SudokuSolver
                 for (int y = 0; y < size; y++)
                 {
                     int suby = y / subGridColumns;
-                    var subGrid = _subGrids[subx, suby] ?? (_subGrids[subx, suby] = new Boundry(size));
 
-                    var cell = new Cell(_rows[x], _columns[y], subGrid, size, grid[x, y]);
+                    if (subGrids[subx, suby] == null)
+                        subGrids[subx, suby] = new Boundry(size);
+
+                    var subGrid = subGrids[subx, suby];
+                    var cell = new Cell(rows[x], columns[y], subGrid, grid[x, y]);
                     cells.Add(cell);
                 }
             }
@@ -68,73 +69,74 @@ namespace SudokuSolver
 
         bool Solve()
         {
-            if (_cells.All(c => c.Value != 0)) return true;
+            var progressed = _cells.All(c => c.Value != 0);
+            if (progressed) return true;
 
-            var status = false;
-            foreach (var cell in _cells)
+            foreach (var cell in _cells.Where(c => c.Value == 0))
             {
-                var cur = cell.TryUpdate();
-                status = status || cur;
+                var updated = cell.TryUpdate();
+                progressed = progressed || updated;
             }
 
-            return status && Solve();
+            return progressed && Solve();
         }
 
-        enum Sizes : int
+        enum GridSize : int
         {
             NineByNine = 9
         }
 
-        class Boundry
+        sealed class Boundry
         {
-            readonly int _size;
             readonly List<Cell> _cells;
 
-            public Boundry(int size)
-            {
-                _size = size;
-                _cells = new List<Cell>(size);
-            }
+            internal Boundry(int size) => _cells = new List<Cell>(size);
 
-            public bool Has(int value) => _cells.Any(c => c.Value == value);
+            public override string ToString() => string.Join(", ", _cells);
 
-            public Boundry AddCell(Cell cell)
-            {
-                _cells.Add(cell);
-                return this;
-            }
+            internal void Append(Cell cell) => _cells.Add(cell);
+
+            internal IEnumerable<int> GetExistingValues() => _cells.Select(c => c.Value).Where(v => v != 0);
         }
 
-        [DebuggerDisplay("Value = {Value}")]
-        class Cell
+        sealed class Cell
         {
-            readonly Boundry[] _boundries;
-            readonly int _size;
-            readonly int[] _allowedValues;
+            readonly IReadOnlyCollection<Boundry> _boundries;
 
-            public Cell(Boundry row, Boundry column, Boundry subGrid, int size, int value)
+            internal Cell(Boundry row, Boundry column, Boundry subGrid, int value)
             {
-                _allowedValues = Enumerable.Range(1, size).ToArray();
-                if (value != 0 && !_allowedValues.Contains(value))
+                if (value != 0 && !s_allowedValues.Contains(value))
                     throw new ArgumentException($"Invalid value {value}", nameof(value));
 
-                Value = value;
+                _boundries = new[] { row, column, subGrid };
+                foreach (var b in _boundries)
+                    b.Append(this);
 
-                _boundries = new[] { row.AddCell(this), column.AddCell(this), subGrid.AddCell(this) };
-                _size = size;
+                Value = value;
             }
 
-            public int Value { get; private set; }
+            internal int Value { get; private set; }
 
-            public bool TryUpdate()
+            public override string ToString() => Value == 0 ? "_" : Value.ToString();
+
+            internal bool TryUpdate()
             {
                 if (Value != 0) return false;
 
-                var possibleValues = _allowedValues.Where(i => _boundries.All(b => !b.Has(i))).ToArray();
-                if (possibleValues.Length != 1) return false;
+                var possibleValues = _boundries
+                    .Aggregate(s_allowedValues, (all, cur) => all.Except(cur.GetExistingValues()))
+                    .ToArray();
 
-                Value = possibleValues[0];
-                return true;
+                switch (possibleValues.Length)
+                {
+                    case 0: throw new InvalidOperationException("Unsolvable puzzle.");
+
+                    case 1:
+                        Value = possibleValues[0];
+                        return true;
+
+                    default: return false;
+                }
             }
         }
 

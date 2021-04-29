@@ -1,11 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\Common.props" />
-
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/mrshridhara/sudoku/</RepositoryUrl>
+    <RepositoryUrl>https://github.com/mrshridhara/sudoku/tree/master/src/SudokuSolver</RepositoryUrl>
+    <Description>SUDOKU solver library.</Description>
   </PropertyGroup>
 
 </Project>
